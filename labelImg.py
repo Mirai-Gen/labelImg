@@ -98,7 +98,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.screencast = "https://youtu.be/p0nR2YsCY_U"
 
         # Load predefined classes to the list
-        self.load_predefined_classes(default_prefdef_class_file)
+        #self.load_predefined_classes(default_prefdef_class_file)
 
         if self.label_hist:
             self.default_label = self.label_hist[0]
@@ -476,8 +476,8 @@ class MainWindow(QMainWindow, WindowMixin):
         position = QPoint(0, 0)
         saved_position = settings.get(SETTING_WIN_POSE, position)
         # Fix the multiple monitors issue
-        for i in range(QApplication.desktop().screenCount()):
-            if QApplication.desktop().availableGeometry(i).contains(saved_position):
+        for screen in QGuiApplication.screens():
+            if screen.availableGeometry().contains(saved_position):
                 position = saved_position
                 break
         self.resize(size)
@@ -916,11 +916,11 @@ class MainWindow(QMainWindow, WindowMixin):
         text = self.combo_box.cb.itemText(index)
         for i in range(self.label_list.count()):
             if text == "":
-                self.label_list.item(i).setCheckState(2)
+                self.label_list.item(i).setCheckState(Qt.Checked)
             elif text != self.label_list.item(i).text():
-                self.label_list.item(i).setCheckState(0)
+                self.label_list.item(i).setCheckState(Qt.Unchecked)
             else:
-                self.label_list.item(i).setCheckState(2)
+                self.label_list.item(i).setCheckState(Qt.Checked)
 
     def default_label_combo_selection_changed(self, index):
         self.default_label=self.label_hist[index]
@@ -985,9 +985,12 @@ class MainWindow(QMainWindow, WindowMixin):
             self.canvas.reset_all_lines()
 
     def scroll_request(self, delta, orientation):
-        units = - delta / (8 * 15)
-        bar = self.scroll_bars[orientation]
-        bar.setValue(int(bar.value() + bar.singleStep() * units))
+        try:
+            units = - delta / (8 * 15)
+            bar = self.scroll_bars[orientation]
+            bar.setValue(int(bar.value() + bar.singleStep() * units))
+        except:
+            pass
 
     def set_zoom(self, value):
         self.actions.fitWidth.setChecked(False)
@@ -1157,7 +1160,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.label_list.setCurrentItem(self.label_list.item(self.label_list.count() - 1))
                 self.label_list.item(self.label_list.count() - 1).setSelected(True)
 
-            self.canvas.setFocus(True)
+            self.canvas.setFocus()
             return True
         return False
 

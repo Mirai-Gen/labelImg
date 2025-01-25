@@ -18,7 +18,7 @@ class LightWidget(QSpinBox):
     def minimumSizeHint(self):
         height = super(LightWidget, self).minimumSizeHint().height()
         fm = QFontMetrics(self.font())
-        width = fm.width(str(self.maximum()))
+        width = fm.horizontalAdvance(str(self.maximum()))
         return QSize(width, height)
 
     def color(self):

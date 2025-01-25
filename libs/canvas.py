@@ -106,6 +106,7 @@ class Canvas(QWidget):
     def selected_vertex(self):
         return self.h_vertex is not None
 
+    ## ============================================================================================
     def mouseMoveEvent(self, ev):
         """Update line with last point and current coordinates."""
         pos = self.transform_pos(ev.pos())
@@ -114,9 +115,10 @@ class Canvas(QWidget):
         window = self.parent().window()
         if window.file_path is not None:
             self.parent().window().label_coordinates.setText(
-                'X: %d; Y: %d' % (pos.x(), pos.y()))
+                'X: %d; Y: %d' % (pos.x(), pos.y())
+            )
 
-        # Polygon drawing.
+        # Polygon drawing
         if self.drawing():
             self.override_cursor(CURSOR_DRAW)
             if self.current:
@@ -124,20 +126,18 @@ class Canvas(QWidget):
                 current_width = abs(self.current[0].x() - pos.x())
                 current_height = abs(self.current[0].y() - pos.y())
                 self.parent().window().label_coordinates.setText(
-                        'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y()))
+                    'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y())
+                )
 
                 color = self.drawing_line_color
                 if self.out_of_pixmap(pos):
-                    # Don't allow the user to draw outside the pixmap.
-                    # Clip the coordinates to 0 or max,
-                    # if they are outside the range [0, max]
+                    # Clip coordinates if outside pixmap
                     size = self.pixmap.size()
                     clipped_x = min(max(0, pos.x()), size.width())
                     clipped_y = min(max(0, pos.y()), size.height())
                     pos = QPointF(clipped_x, clipped_y)
                 elif len(self.current) > 1 and self.close_enough(pos, self.current[0]):
-                    # Attract line to starting point and colorise to alert the
-                    # user:
+                    # Snap to starting point
                     pos = self.current[0]
                     color = self.current.line_color
                     self.override_cursor(CURSOR_POINT)
@@ -162,7 +162,7 @@ class Canvas(QWidget):
             self.repaint()
             return
 
-        # Polygon copy moving.
+        # Polygon copy moving
         if Qt.RightButton & ev.buttons():
             if self.selected_shape_copy and self.prev_point:
                 self.override_cursor(CURSOR_MOVE)
@@ -173,7 +173,7 @@ class Canvas(QWidget):
                 self.repaint()
             return
 
-        # Polygon/Vertex moving.
+        # Polygon/Vertex moving
         if Qt.LeftButton & ev.buttons():
             if self.selected_vertex():
                 self.bounded_move_vertex(pos)
@@ -186,7 +186,8 @@ class Canvas(QWidget):
                 current_width = abs(point1.x() - point3.x())
                 current_height = abs(point1.y() - point3.y())
                 self.parent().window().label_coordinates.setText(
-                        'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y()))
+                    'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y())
+                )
             elif self.selected_shape and self.prev_point:
                 self.override_cursor(CURSOR_MOVE)
                 self.bounded_move_shape(self.selected_shape, pos)
@@ -199,24 +200,20 @@ class Canvas(QWidget):
                 current_width = abs(point1.x() - point3.x())
                 current_height = abs(point1.y() - point3.y())
                 self.parent().window().label_coordinates.setText(
-                        'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y()))
+                    'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y())
+                )
             else:
-                # pan
+                # Pan
                 delta = ev.pos() - self.pan_initial_pos
                 self.scrollRequest.emit(delta.x(), Qt.Horizontal)
                 self.scrollRequest.emit(delta.y(), Qt.Vertical)
                 self.update()
             return
 
-        # Just hovering over the canvas, 2 possibilities:
-        # - Highlight shapes
-        # - Highlight vertex
-        # Update shape/vertex fill and tooltip value accordingly.
+        # Hovering over the canvas
         self.setToolTip("Image")
         priority_list = self.shapes + ([self.selected_shape] if self.selected_shape else [])
         for shape in reversed([s for s in priority_list if self.isVisible(s)]):
-            # Look for a nearby vertex to highlight. If that fails,
-            # check if we happen to be inside a shape.
             index = shape.nearest_vertex(pos, self.epsilon)
             if index is not None:
                 if self.selected_vertex():
@@ -233,25 +230,33 @@ class Canvas(QWidget):
                     self.h_shape.highlight_clear()
                 self.h_vertex, self.h_shape = None, shape
                 self.setToolTip(
-                    "Click & drag to move shape '%s'" % shape.label)
+                    "Click & drag to move shape '%s'" % shape.label
+                )
                 self.setStatusTip(self.toolTip())
                 self.override_cursor(CURSOR_GRAB)
                 self.update()
 
-                # Display annotation width and height while hovering inside
+                # Display annotation width and height while hovering
                 point1 = self.h_shape[1]
                 point3 = self.h_shape[3]
                 current_width = abs(point1.x() - point3.x())
                 current_height = abs(point1.y() - point3.y())
                 self.parent().window().label_coordinates.setText(
-                        'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y()))
+                    'Width: %d, Height: %d / X: %d; Y: %d' % (current_width, current_height, pos.x(), pos.y())
+                )
                 break
-        else:  # Nothing found, clear highlights, reset state.
+        else:
+            # Clear highlights and reset state
             if self.h_shape:
                 self.h_shape.highlight_clear()
                 self.update()
             self.h_vertex, self.h_shape = None, None
             self.override_cursor(CURSOR_DEFAULT)
+
+    
+    
+    
+    ## ============================================================================================
 
     def mousePressEvent(self, ev):
         pos = self.transform_pos(ev.pos())
@@ -497,7 +502,7 @@ class Canvas(QWidget):
         p = self._painter
         p.begin(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.setRenderHint(QPainter.HighQualityAntialiasing)
+        #p.setRenderHint(QPainter.HighQualityAntialiasing)
         p.setRenderHint(QPainter.SmoothPixmapTransform)
 
         p.scale(self.scale, self.scale)
@@ -553,8 +558,12 @@ class Canvas(QWidget):
         p.end()
 
     def transform_pos(self, point):
-        """Convert from widget-logical coordinates to painter-logical coordinates."""
-        return point / self.scale - self.offset_to_center()
+        """Transform a point's position based on the current scale and offset."""
+        center_offset = self.offset_to_center()
+        # Ensure center_offset is also a QPointF if needed
+        center_offset = QPointF(center_offset) if not isinstance(center_offset, QPointF) else center_offset
+        return QPointF(point.x() / self.scale - center_offset.x(),
+                    point.y() / self.scale - center_offset.y())
 
     def offset_to_center(self):
         s = self.scale
