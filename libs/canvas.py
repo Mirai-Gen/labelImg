@@ -1,11 +1,9 @@
 
-try:
-    from PyQt5.QtGui import *
-    from PyQt5.QtCore import *
-    from PyQt5.QtWidgets import *
-except ImportError:
-    from PyQt4.QtGui import *
-    from PyQt4.QtCore import *
+
+from PySide6.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+
 
 # from PyQt4.QtOpenGL import *
 
@@ -22,13 +20,13 @@ CURSOR_GRAB = Qt.OpenHandCursor
 
 
 class Canvas(QWidget):
-    zoomRequest = pyqtSignal(int)
-    lightRequest = pyqtSignal(int)
-    scrollRequest = pyqtSignal(int, int)
-    newShape = pyqtSignal()
-    selectionChanged = pyqtSignal(bool)
-    shapeMoved = pyqtSignal()
-    drawingPolygon = pyqtSignal(bool)
+    zoomRequest = Signal(int)
+    lightRequest = Signal(int)
+    scrollRequest = Signal(int, int)
+    newShape = Signal()
+    selectionChanged = Signal(bool)
+    shapeMoved = Signal()
+    drawingPolygon = Signal(bool)
 
     CREATE, EDIT = list(range(2))
 

@@ -11,13 +11,7 @@ import sys
 import locale
 from libs.ustr import ustr
 
-try:
-    from PyQt5.QtCore import *
-except ImportError:
-    if sys.version_info.major >= 3:
-        import sip
-        sip.setapi('QVariant', 2)
-    from PyQt4.QtCore import *
+from PySide6.QtCore import *
 
 
 class StringBundle:
@@ -66,7 +60,8 @@ class StringBundle:
         if f.exists():
             if f.open(QIODevice.ReadOnly | QFile.Text):
                 text = QTextStream(f)
-                text.setCodec("UTF-8")
+                # Cambia "UTF-8" por QStringConverter.Encoding.UTF8
+                text.setEncoding(QStringConverter.Encoding.Utf8)
 
             while not text.atEnd():
                 line = ustr(text.readLine())
