@@ -27,3 +27,10 @@ class LightWidget(QSpinBox):
 
         strength = int(self.value()/100 * 255 + 0.5)
         return QColor(strength, strength, strength)
+
+if __name__ == "__main__":
+    import sys
+    app = QApplication(sys.argv)
+    widget = LightWidget("Hola")
+    widget.show()
+    sys.exit(app.exec())

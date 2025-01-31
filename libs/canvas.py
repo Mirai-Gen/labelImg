@@ -3,10 +3,6 @@
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
-
-
-# from PyQt4.QtOpenGL import *
-
 from libs.shape import Shape
 from libs.utils import distance
 
@@ -15,9 +11,6 @@ CURSOR_POINT = Qt.PointingHandCursor
 CURSOR_DRAW = Qt.CrossCursor
 CURSOR_MOVE = Qt.ClosedHandCursor
 CURSOR_GRAB = Qt.OpenHandCursor
-
-# class Canvas(QGLWidget):
-
 
 class Canvas(QWidget):
     zoomRequest = Signal(int)
@@ -112,9 +105,9 @@ class Canvas(QWidget):
         pos = self.transform_pos(ev.pos())
 
         # Update coordinates in status bar if image is opened
-        window = self.parent().window()
+        window = self.window()
         if window.file_path is not None:
-            self.parent().window().label_coordinates.setText(
+            self.window().label_coordinates.setText(
                 'X: %d; Y: %d' % (pos.x(), pos.y())
             )
 
@@ -753,3 +746,10 @@ class Canvas(QWidget):
 
     def set_drawing_shape_to_square(self, status):
         self.draw_square = status
+
+if __name__ == '__main__':
+    import sys
+    app = QApplication(sys.argv)
+    win = Canvas()
+    win.show()
+    sys.exit(app.exec())
